@@ -20,7 +20,13 @@ import sys
 import json
 import requests
 
+# Hack to allow secure absolute imports across the Python paths universally
+WORKSPACE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if WORKSPACE_ROOT not in sys.path:
+    sys.path.insert(0, WORKSPACE_ROOT)
+
 from openai import OpenAI
+from grader import grade_episode
 
 
 # ── Configuration ───────────────────────────────────────────────────────────
@@ -199,26 +205,12 @@ def run_inference():
                 })
 
         # Get final state for score
-        try:
-            final_state = env_state()
-            # Calculate episode score from the environment
-            # The score is: clip(episode_reward / max_possible, 0.0, 1.0)
-            from drug_interaction_env.server.drug_interaction_environment import DrugInteractionEnvironment
-            score = DrugInteractionEnvironment()
-            # We'll calculate from the step data
-            # Actually, get it from the env directly
-        except Exception:
-            pass
+        state_data = env_state()
+        
+        # Compute episode score entirely from the standalone grader module 
+        episode_score = grade_episode(task_level, state_data)
 
-        # Use a simple approach: re-import env to get score
-        try:
-            resp = requests.get(f"{ENV_BASE_URL}/state")
-            state_data = resp.json()
-        except Exception:
-            state_data = {}
-
-        # Calculate score from state data
-        episode_score = state_data.get("episode_score", 0.0)
+        # MANDATORY log format
         print(f"[END] task={task_level} patient_id={patient_id} episode_score={episode_score}")
 
 

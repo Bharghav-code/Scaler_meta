@@ -140,7 +140,7 @@ class DrugInteractionEnvironment:
 
         # Update tracking
         self.identified_pairs.add(key)
-        self.predictions[str(key)] = {
+        self.predictions[f"{key[0]}|{key[1]}"] = {
             "predicted_severity": severity,
             "predicted_action": action,
             "ground_truth_severity": gt["severity"],
@@ -256,9 +256,10 @@ class DrugInteractionEnvironment:
             "patient_id": self.patient["patient_id"],
             "step_count": self.step_count,
             "task_level": self.task_level,
-            "attempted_keys": [str(k) for k in self.attempted_keys],
-            "identified_pairs": [str(k) for k in self.identified_pairs],
-            "perfectly_completed_pairs": [str(k) for k in self.perfectly_completed_pairs],
+            "attempted_keys": [f"{k[0]}|{k[1]}" for k in self.attempted_keys],
+            "identified_pairs": [f"{k[0]}|{k[1]}" for k in self.identified_pairs],
+            "perfectly_completed_pairs": [f"{k[0]}|{k[1]}" for k in self.perfectly_completed_pairs],
+            "ground_truth_keys": [f"{k[0]}|{k[1]}" for k in self.ground_truth_keys],
             "predictions": self.predictions,
             "done": self.done,
         }

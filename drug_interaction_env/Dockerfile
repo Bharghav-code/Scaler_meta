@@ -6,5 +6,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Safely map Python absolute imports by pointing the namespace back to /app
+RUN ln -s /app /app/drug_interaction_env
+ENV PYTHONPATH="/app"
+
 EXPOSE 8000
 CMD ["uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "8000"]
