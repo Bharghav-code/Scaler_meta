@@ -68,5 +68,70 @@ class TestEnvironment(unittest.TestCase):
         self.assertTrue(done)
         self.assertAlmostEqual(self.env.get_episode_score(), 0.0) # max(0, -0.4 / 0.8)
 
+    def test_medium_episode(self):
+        self.env.reset("medium")
+        
+        # Step 1: clopidogrel + omeprazole (severe, replace_drug) => 0.8 reward
+        obs, reward, done, state = self.env.step({
+            "action_type": "flag_interaction",
+            "drug_a": "clopidogrel",
+            "drug_b": "omeprazole",
+            "severity": "severe",
+            "suggested_action": "replace_drug"
+        })
+        self.assertFalse(done)
+        self.assertAlmostEqual(reward, 0.8)
+        
+        # Step 2: ciprofloxacin + theophylline (moderate, reduce_dose) => 0.8 reward
+        obs, reward, done, state = self.env.step({
+            "action_type": "flag_interaction",
+            "drug_a": "ciprofloxacin",
+            "drug_b": "theophylline",
+            "severity": "moderate",
+            "suggested_action": "reduce_dose"
+        })
+        self.assertFalse(done)
+        self.assertAlmostEqual(reward, 0.8)
+
+        # Step 3: levothyroxine + calcium (mild, monitor) => 0.8 reward
+        obs, reward, done, state = self.env.step({
+            "action_type": "flag_interaction",
+            "drug_a": "levothyroxine",
+            "drug_b": "calcium",
+            "severity": "mild",
+            "suggested_action": "monitor"
+        })
+        
+        # Should be perfectly completed now
+        self.assertTrue(done)
+        self.assertAlmostEqual(self.env.get_episode_score(), 1.0)
+
+    def test_hard_episode(self):
+        self.env.reset("hard")
+        
+        actions = [
+            ("amiodarone", "simvastatin", "severe", "reduce_dose"),
+            ("amiodarone", "digoxin", "severe", "reduce_dose"),
+            ("ssri", "tramadol", "severe", "replace_drug"),
+            ("digoxin", "furosemide", "moderate", "monitor"),
+            ("levothyroxine", "calcium", "mild", "monitor"),
+        ]
+        
+        for i, (da, db, sev, act) in enumerate(actions):
+            obs, reward, done, state = self.env.step({
+                "action_type": "flag_interaction",
+                "drug_a": da,
+                "drug_b": db,
+                "severity": sev,
+                "suggested_action": act
+            })
+            self.assertAlmostEqual(reward, 0.8)
+            if i < len(actions) - 1:
+                self.assertFalse(done)
+            else:
+                self.assertTrue(done)
+        
+        self.assertAlmostEqual(self.env.get_episode_score(), 1.0)
+
 if __name__ == "__main__":
     unittest.main()
