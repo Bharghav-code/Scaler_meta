@@ -1,0 +1,6 @@
+spec_version: 1
+name: drug-interaction-env
+type: step-reset
+runtime: docker
+app: server/app.py
+port: 8000

@@ -1,0 +1,21 @@
+E
+======================================================================
+ERROR: drug_interaction_env (unittest.loader._FailedTest.drug_interaction_env)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: drug_interaction_env
+Traceback (most recent call last):
+  File "C:\Program Files\Python314\Lib\unittest\loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+  File "C:\Users\Laxmikant Joshi\Desktop\Scaler_hackathon\drug_interaction_env\__init__.py", line 3, in <module>
+    from drug_interaction_env.models import (
+    ...<5 lines>...
+    )
+  File "C:\Users\Laxmikant Joshi\Desktop\Scaler_hackathon\drug_interaction_env\models.py", line 3, in <module>
+    from pydantic import BaseModel
+ModuleNotFoundError: No module named 'pydantic'
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+FAILED (errors=1)

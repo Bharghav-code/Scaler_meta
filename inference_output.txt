@@ -1,0 +1,2 @@
+[ERROR] Missing required env vars: API_BASE_URL, MODEL_NAME, HF_TOKEN
+[INFO] Running in LOCAL-ONLY mode (no LLM calls)

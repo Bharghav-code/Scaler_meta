@@ -1,0 +1,15 @@
+
+EASY: 1 interactions found
+  (warfarin, aspirin) => severity=severe, action=replace_drug
+
+MEDIUM: 3 interactions found
+  (clopidogrel, omeprazole) => severity=severe, action=replace_drug
+  (ciprofloxacin, theophylline) => severity=moderate, action=reduce_dose
+  (levothyroxine, calcium) => severity=mild, action=monitor
+
+HARD: 5 interactions found
+  (amiodarone, simvastatin) => severity=severe, action=reduce_dose
+  (amiodarone, digoxin) => severity=severe, action=reduce_dose
+  (ssri, tramadol) => severity=severe, action=replace_drug
+  (digoxin, furosemide) => severity=moderate, action=monitor
+  (levothyroxine, calcium) => severity=mild, action=monitor
