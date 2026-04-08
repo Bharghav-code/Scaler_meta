@@ -41,9 +41,11 @@ class StepResponse(BaseModel):
 # API ENDPOINTS
 
 @app.post("/reset")
-def reset_endpoint(request: ResetRequest):
+def reset_endpoint(request: ResetRequest = None):
     """Initialize a new episode for the specified task level."""
     try:
+        if request is None:
+            request = ResetRequest()
         observation = env.reset(request.task_level)
         return observation
     except ValueError as e:
