@@ -40,9 +40,10 @@ class StepResponse(BaseModel):
     state: dict
 # API ENDPOINTS
 
+from typing import Optional
+
 @app.post("/reset")
-def reset_endpoint(request: ResetRequest = None):
-    """Initialize a new episode for the specified task level."""
+def reset_endpoint(request: Optional[ResetRequest] = None):
     try:
         if request is None:
             request = ResetRequest()
