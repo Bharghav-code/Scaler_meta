@@ -34,10 +34,3 @@ Building core logic layer (Person A) + Docker/Deployment (Person B) for a Pharma
 - [x] Docker build test (Dockerfile format verified; local Docker daemon not running)
 
 ---
-
-## Build Log
-
-| Timestamp | File | Status | Notes |
-|-----------|------|--------|-------|
-| Starting... | — | — | Reading specs and planning |
-| 2026-04-04 | All tests | Passed | Core logic, routing, and scoring verified |
