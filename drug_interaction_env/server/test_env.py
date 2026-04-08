@@ -24,12 +24,12 @@ class TestEnvironment(unittest.TestCase):
     def test_validate_duplicate(self):
         action = {"drug_a": "warfarin", "drug_b": "aspirin"}
         self.assertTrue(self.env.validate(action))
-        self.assertIsNone(self.env.validate(action))  # second time -> None
+        self.assertIsNone(self.env.validate(action))  
 
     def test_calculate_reward_perfect(self):
-        key = ("aspirin", "warfarin") # sorted
+        key = ("aspirin", "warfarin") 
         reward = self.env.calculate_reward(key, "severe", "replace_drug")
-        # base (0.4) + severity (0.2) + action (0.2) = 0.8
+     
         self.assertAlmostEqual(reward, 0.8)
         self.assertIn(key, self.env.perfectly_completed_pairs)
         self.assertIn(key, self.env.identified_pairs)
@@ -37,14 +37,14 @@ class TestEnvironment(unittest.TestCase):
     def test_calculate_reward_wrong_severity_severe(self):
         key = ("aspirin", "warfarin")
         reward = self.env.calculate_reward(key, "moderate", "replace_drug")
-        # base (0.4) + severity wrong (-0.2 for GT severe) + action right (0.2) = 0.4
+     
         self.assertAlmostEqual(reward, 0.4)
         self.assertNotIn(key, self.env.perfectly_completed_pairs)
 
     def test_calculate_reward_wrong_action(self):
         key = ("aspirin", "warfarin")
         reward = self.env.calculate_reward(key, "severe", "monitor")
-        # base (0.4) + severity right (0.2) + action wrong (-0.1) = 0.5
+      
         self.assertAlmostEqual(reward, 0.5)
 
     def test_complete_episode(self):
@@ -66,12 +66,12 @@ class TestEnvironment(unittest.TestCase):
         # 1 severe missed -> penalty = -0.4
         self.assertAlmostEqual(reward, -0.4)
         self.assertTrue(done)
-        self.assertAlmostEqual(self.env.get_episode_score(), 0.0) # max(0, -0.4 / 0.8)
+        self.assertAlmostEqual(self.env.get_episode_score(), 0.0) 
 
     def test_medium_episode(self):
         self.env.reset("medium")
         
-        # Step 1: clopidogrel + omeprazole (severe, replace_drug) => 0.8 reward
+
         obs, reward, done, state = self.env.step({
             "action_type": "flag_interaction",
             "drug_a": "clopidogrel",
@@ -82,7 +82,6 @@ class TestEnvironment(unittest.TestCase):
         self.assertFalse(done)
         self.assertAlmostEqual(reward, 0.8)
         
-        # Step 2: ciprofloxacin + theophylline (moderate, reduce_dose) => 0.8 reward
         obs, reward, done, state = self.env.step({
             "action_type": "flag_interaction",
             "drug_a": "ciprofloxacin",
@@ -93,7 +92,7 @@ class TestEnvironment(unittest.TestCase):
         self.assertFalse(done)
         self.assertAlmostEqual(reward, 0.8)
 
-        # Step 3: levothyroxine + calcium (mild, monitor) => 0.8 reward
+
         obs, reward, done, state = self.env.step({
             "action_type": "flag_interaction",
             "drug_a": "levothyroxine",
@@ -102,7 +101,6 @@ class TestEnvironment(unittest.TestCase):
             "suggested_action": "monitor"
         })
         
-        # Should be perfectly completed now
         self.assertTrue(done)
         self.assertAlmostEqual(self.env.get_episode_score(), 1.0)
 

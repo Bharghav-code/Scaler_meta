@@ -1,21 +1,6 @@
-"""
-drug_database.py — Hardcoded dictionary of real, publicly documented drug-drug interactions.
-
-Keys are always tuple(sorted([drug_a.lower(), drug_b.lower()])) for deterministic lookup.
-Each entry contains severity, recommended action, and a brief clinical explanation.
-
-Sources: FDA drug interactions database, clinical pharmacology references.
-"""
-
-# ─── DRUG INTERACTIONS DATABASE ────────────────────────────────────────────────
-# 35 real, well-documented interaction pairs
-# Distribution: 12 severe, 13 moderate, 10 mild
+# severe interactions -> 12
 
 DRUG_INTERACTIONS: dict[tuple[str, str], dict] = {
-
-    # ══════════════════════════════════════════════════════════════════════════
-    # SEVERE INTERACTIONS (12)
-    # ══════════════════════════════════════════════════════════════════════════
 
     ("aspirin", "warfarin"): {
         "severity": "severe",
@@ -78,9 +63,7 @@ DRUG_INTERACTIONS: dict[tuple[str, str], dict] = {
         "explanation": "Fatal serotonin syndrome risk — absolute contraindication"
     },
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # MODERATE INTERACTIONS (13)
-    # ══════════════════════════════════════════════════════════════════════════
+#    Moderate Interaction ->10
 
     ("ibuprofen", "metformin"): {
         "severity": "moderate",
@@ -148,10 +131,7 @@ DRUG_INTERACTIONS: dict[tuple[str, str], dict] = {
         "explanation": "Ibuprofen antagonizes aspirin's antiplatelet effect"
     },
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # MILD INTERACTIONS (10)
-    # ══════════════════════════════════════════════════════════════════════════
-
+    # Mild Interaction -> 10
     ("metformin", "omeprazole"): {
         "severity": "mild",
         "action": "monitor",
@@ -217,7 +197,7 @@ def lookup_pair(drug_a: str, drug_b: str) -> dict | None:
     return DRUG_INTERACTIONS.get(key, None)
 
 
-# ─── Quick self-check ──────────────────────────────────────────────────────────
+
 if __name__ == "__main__":
     severe = [k for k, v in DRUG_INTERACTIONS.items() if v["severity"] == "severe"]
     moderate = [k for k, v in DRUG_INTERACTIONS.items() if v["severity"] == "moderate"]
@@ -226,7 +206,7 @@ if __name__ == "__main__":
     print(f"  Severe:   {len(severe)}")
     print(f"  Moderate: {len(moderate)}")
     print(f"  Mild:     {len(mild)}")
-    # Verify lookup helper
+    
     assert lookup_pair("Warfarin", "aspirin") is not None
     assert lookup_pair("aspirin", "warfarin") is not None
     assert lookup_pair("fakeDrug", "warfarin") is None

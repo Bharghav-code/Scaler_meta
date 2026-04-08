@@ -15,11 +15,6 @@ fire. "Safe" filler drugs (no entries in DRUG_INTERACTIONS) are used to pad list
 
 PATIENTS: dict[str, dict] = {
 
-    # ═════════════════════════════════════════════════════════════════════════
-    # EASY — 6 drugs, 1 interaction
-    # ═════════════════════════════════════════════════════════════════════════
-    # Intended interaction:
-    #   (aspirin, warfarin) → severe / replace_drug
     "easy": {
         "patient_id": "P001",
         "age": 67,
@@ -34,15 +29,7 @@ PATIENTS: dict[str, dict] = {
         ],
     },
 
-    # ═════════════════════════════════════════════════════════════════════════
-    # MEDIUM — 10 drugs, 3 interactions
-    # ═════════════════════════════════════════════════════════════════════════
-    # Intended interactions:
-    #   (clopidogrel, omeprazole)    → severe   / replace_drug
-    #   (ciprofloxacin, theophylline)→ moderate / reduce_dose
-    #   (calcium, levothyroxine)     → mild     / monitor
-    #
-    # No warfarin (interacts with too many things), no amiodarone, no atorvastatin
+
     "medium": {
         "patient_id": "P002",
         "age": 54,
@@ -61,37 +48,6 @@ PATIENTS: dict[str, dict] = {
         ],
     },
 
-    # ═════════════════════════════════════════════════════════════════════════
-    # HARD — 15 drugs, 5 interactions
-    # ═════════════════════════════════════════════════════════════════════════
-    # Intended interactions:
-    #   (aspirin, warfarin)           → severe   / replace_drug
-    #   (amiodarone, simvastatin)     → severe   / reduce_dose
-    #   (ssri, tramadol)              → severe   / replace_drug
-    #   (digoxin, furosemide)         → moderate / monitor
-    #   (calcium, levothyroxine)      → mild     / monitor
-    #
-    # AVOID putting warfarin with amiodarone (that's an extra interaction!)
-    # So we DON'T include warfarin+amiodarone together.
-    # Solution: remove warfarin from hard, use ibuprofen for the severe one instead.
-    # Wait — (ibuprofen, warfarin) is severe... let me restructure.
-    # Actually let's keep warfarin+aspirin but remove amiodarone's conflict with warfarin
-    # by not having warfarin here. Use different severe pairs.
-    #
-    # Revised plan — NO warfarin in hard:
-    #   (amiodarone, simvastatin)     → severe   / reduce_dose
-    #   (ssri, tramadol)              → severe   / replace_drug
-    #   (amiodarone, digoxin)         → severe   / reduce_dose
-    #   (digoxin, furosemide)         → moderate / monitor
-    #   (calcium, levothyroxine)      → mild     / monitor
-    #
-    # Check: amiodarone+simvastatin ✓, ssri+tramadol ✓, amiodarone+digoxin ✓,
-    #         digoxin+furosemide ✓, calcium+levothyroxine ✓
-    # Any others? digoxin+omeprazole is mild — don't include omeprazole!
-    #             amiodarone+atorvastatin is moderate — don't include atorvastatin!
-    #             digoxin+spironolactone is moderate — don't include spironolactone!
-    #             furosemide+metformin is mild — don't include metformin!
-    #             furosemide+lisinopril is moderate — don't include lisinopril!
     "hard": {
         "patient_id": "P003",
         "age": 71,
@@ -116,8 +72,6 @@ PATIENTS: dict[str, dict] = {
     },
 }
 
-
-# ─── Verification script ──────────────────────────────────────────────────────
 if __name__ == "__main__":
     from itertools import combinations
     from drug_database import DRUG_INTERACTIONS, lookup_pair

@@ -20,7 +20,6 @@ import sys
 import json
 import requests
 
-# Hack to allow secure absolute imports across the Python paths universally
 WORKSPACE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if WORKSPACE_ROOT not in sys.path:
     sys.path.insert(0, WORKSPACE_ROOT)
@@ -29,7 +28,7 @@ from openai import OpenAI
 from grader import grade_episode
 
 
-# ── Configuration ───────────────────────────────────────────────────────────
+
 
 ENV_BASE_URL = os.environ.get("ENV_BASE_URL", "http://localhost:8000")
 API_BASE_URL = os.environ.get("API_BASE_URL")
@@ -54,8 +53,6 @@ Rules:
 - Send DONE when you have found all interactions
 - Output ONLY the JSON object, no explanations or markdown"""
 
-
-# ── Helpers ─────────────────────────────────────────────────────────────────
 
 def env_reset(task_level: str) -> dict:
     """Call POST /reset on the environment server."""
@@ -109,8 +106,7 @@ def parse_llm_action(response_text: str) -> dict:
                     return json.loads(block)
                 except json.JSONDecodeError:
                     continue
-
-    # Try direct parse
+    # Direct Parsing
     try:
         return json.loads(text)
     except json.JSONDecodeError:
@@ -125,12 +121,12 @@ def parse_llm_action(response_text: str) -> dict:
         except json.JSONDecodeError:
             pass
 
-    # Fallback: send DONE
+    # Fallback
     print("[WARN] Could not parse LLM response, sending DONE as fallback", file=sys.stderr)
     return {"action_type": "DONE"}
 
 
-# ── Main inference loop ─────────────────────────────────────────────────────
+
 
 def run_inference():
     """Run inference across all task levels."""
@@ -159,7 +155,7 @@ def run_inference():
             step_num += 1
 
             try:
-                # Call LLM
+                # LLM Calling is done here
                 response = client.chat.completions.create(
                     model=MODEL_NAME,
                     messages=messages,
@@ -172,7 +168,7 @@ def run_inference():
                 print(f"[WARN] LLM call failed: {e}, sending DONE", file=sys.stderr)
                 action = {"action_type": "DONE"}
 
-            # Send action to environment
+            # action is sent to the env
             try:
                 result = env_step(action)
             except Exception as e:
@@ -183,7 +179,7 @@ def run_inference():
             done = result["done"]
             observation = result["observation"]
 
-            # Log step
+            # step is stored
             if action["action_type"] == "flag_interaction":
                 print(
                     f"[STEP] step={step_num} action=flag_interaction"
@@ -204,13 +200,10 @@ def run_inference():
                     "content": build_user_message(observation),
                 })
 
-        # Get final state for score
         state_data = env_state()
-        
-        # Compute episode score entirely from the standalone grader module 
+
         episode_score = grade_episode(task_level, state_data)
 
-        # MANDATORY log format
         print(f"[END] task={task_level} patient_id={patient_id} episode_score={episode_score}")
 
 

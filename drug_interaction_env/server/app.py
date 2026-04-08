@@ -19,12 +19,8 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Single global environment instance
+
 env = DrugInteractionEnvironment()
-
-
-# ── Request / Response models ───────────────────────────────────────────────
-
 class ResetRequest(BaseModel):
     task_level: Literal["easy", "medium", "hard"] = "easy"
 
@@ -42,9 +38,7 @@ class StepResponse(BaseModel):
     reward: float
     done: bool
     state: dict
-
-
-# ── Endpoints ───────────────────────────────────────────────────────────────
+# API ENDPOINTS
 
 @app.post("/reset")
 def reset_endpoint(request: ResetRequest):

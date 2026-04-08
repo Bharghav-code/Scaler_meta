@@ -38,7 +38,7 @@ class DrugInteractionEnvironment:
         self.episode_reward: float = 0.0
         self.done: bool = False
 
-    # ── reset ───────────────────────────────────────────────────────────────
+ 
 
     def reset(self, task_level: str = "easy") -> dict:
         """Initialize a new episode for the given task level."""
@@ -48,7 +48,7 @@ class DrugInteractionEnvironment:
         self.task_level = task_level
         self.patient = PATIENTS[task_level]
 
-        # Derive ground truth by scanning all medication pairs
+   
         meds = self.patient["medications"]
         self.ground_truth_keys = set()
         for a, b in combinations(meds, 2):
@@ -56,10 +56,10 @@ class DrugInteractionEnvironment:
             if key in DRUG_INTERACTIONS:
                 self.ground_truth_keys.add(key)
 
-        # Set step budget
+   
         self.max_steps = len(self.ground_truth_keys) * 3
 
-        # Reset tracking state
+
         self.attempted_keys = set()
         self.identified_pairs = set()
         self.perfectly_completed_pairs = set()
@@ -71,66 +71,65 @@ class DrugInteractionEnvironment:
 
         return self._get_observation()
 
-    # ── validate ────────────────────────────────────────────────────────────
-
-    def validate(self, action: dict) -> bool | None:
-        """Validate a flag_interaction action.
-
+  
+# Validation logic
+    """Validate a flag_interaction action.
         Returns:
             True  — valid pair found in DRUG_INTERACTIONS
             False — invalid drug name or phantom pair
             None  — duplicate (already attempted)
         """
+    def validate(self, action: dict) -> bool | None:
+        
         drug_a = action.get("drug_a", "")
         drug_b = action.get("drug_b", "")
 
-        # Step 1: Normalize key
+
         key = tuple(sorted([drug_a.lower(), drug_b.lower()]))
 
-        # Step 2: Validate drug names are in patient's medication list
+
         meds_lower = [m.lower() for m in self.patient["medications"]]
         if drug_a.lower() not in meds_lower or drug_b.lower() not in meds_lower:
-            return False  # invalid drug name
+            return False 
 
-        # Step 3: Check for duplicate
+  
         if key in self.attempted_keys:
-            return None  # duplicate
-
-        # Step 4: Add to attempted keys
+            return None  
+       
         self.attempted_keys.add(key)
 
-        # Step 5: Check against DRUG_INTERACTIONS
+       
         if key not in DRUG_INTERACTIONS:
-            return False  # phantom pair
+            return False  
 
-        return True  # valid pair
+        return True  
 
-    # ── calculate_reward ────────────────────────────────────────────────────
-
-    def calculate_reward(self, key: tuple, severity: str, action: str) -> float:
-        """Calculate step reward for a valid pair.
+        #  Reward calculation
+    """Calculate step reward for a valid pair.
 
         Args:
             key: Normalized sorted tuple (drug_a, drug_b)
             severity: Agent's predicted severity
             action: Agent's predicted suggested action
         """
+
+    def calculate_reward(self, key: tuple, severity: str, action: str) -> float:
         gt = DRUG_INTERACTIONS[key]
 
-        # Base score: pair correctly identified
+        
         base_score = 0.4
 
-        # Severity scoring
+
         if severity == gt["severity"]:
             severity_score = 0.2
         elif gt["severity"] == "severe":
             severity_score = -0.2
         elif gt["severity"] == "moderate":
             severity_score = -0.1
-        else:  # mild
+        else:  
             severity_score = -0.05
 
-        # Action scoring
+       
         if action == gt["action"]:
             action_score = 0.2
         else:
@@ -138,7 +137,7 @@ class DrugInteractionEnvironment:
 
         step_reward = base_score + severity_score + action_score
 
-        # Update tracking
+        # Updation 
         self.identified_pairs.add(key)
         self.predictions[f"{key[0]}|{key[1]}"] = {
             "predicted_severity": severity,
@@ -153,7 +152,7 @@ class DrugInteractionEnvironment:
 
         return step_reward
 
-    # ── step ────────────────────────────────────────────────────────────────
+    # Step function
 
     def step(self, action: dict) -> tuple[dict, float, bool, dict]:
         """Process one agent action.
@@ -164,13 +163,13 @@ class DrugInteractionEnvironment:
         if self.done:
             raise RuntimeError("Episode already done. Call reset() first.")
 
-        # Handle DONE action
+        
         if action.get("action_type") == "DONE":
             reward = self._apply_termination_penalty()
             self.done = True
             return self._get_observation(), reward, True, self._get_state()
 
-        # Process flag_interaction action
+        
         key = tuple(sorted([
             action.get("drug_a", "").lower(),
             action.get("drug_b", "").lower(),
@@ -179,19 +178,19 @@ class DrugInteractionEnvironment:
         result = self.validate(action)
 
         if result is None:
-            # Duplicate
+          
             step_reward = -0.05
         elif result is False:
-            # Phantom pair or invalid drug
+            
             step_reward = -0.3
         else:
-            # Valid pair — calculate full reward
+        
             step_reward = self.calculate_reward(
                 key,
                 action.get("severity", ""),
                 action.get("suggested_action", ""),
             )
-            # Add to flags raised
+  
             self.flags_raised.append(FlagEntry(
                 drug_a=action.get("drug_a", ""),
                 drug_b=action.get("drug_b", ""),
@@ -204,13 +203,12 @@ class DrugInteractionEnvironment:
         self.episode_reward += step_reward
         self.step_count += 1
 
-        # Check perfect completion
         if (self.perfectly_completed_pairs
                 and self.perfectly_completed_pairs == self.ground_truth_keys):
             self.done = True
             return self._get_observation(), step_reward, True, self._get_state()
 
-        # Check step budget
+      
         if self.step_count >= self.max_steps:
             penalty = self._apply_termination_penalty()
             self.done = True
@@ -218,7 +216,7 @@ class DrugInteractionEnvironment:
 
         return self._get_observation(), step_reward, False, self._get_state()
 
-    # ── termination penalty ─────────────────────────────────────────────────
+
 
     def _apply_termination_penalty(self) -> float:
         """Calculate severity-weighted penalty for unidentified pairs."""
@@ -235,8 +233,6 @@ class DrugInteractionEnvironment:
         self.episode_reward += penalty
         return penalty
 
-    # ── observation ─────────────────────────────────────────────────────────
-
     def _get_observation(self) -> dict:
         """Build the observation dict visible to the agent."""
         return {
@@ -248,7 +244,7 @@ class DrugInteractionEnvironment:
             "steps_remaining": self.max_steps - self.step_count,
         }
 
-    # ── state ───────────────────────────────────────────────────────────────
+
 
     def _get_state(self) -> dict:
         """Build the internal state dict (for grading/debugging)."""
@@ -269,7 +265,7 @@ class DrugInteractionEnvironment:
         """Property accessor for state."""
         return self._get_state()
 
-    # ── episode score ───────────────────────────────────────────────────────
+# Final Episod Score
 
     def get_episode_score(self) -> float:
         """Normalize episode reward to [0.0, 1.0]."""

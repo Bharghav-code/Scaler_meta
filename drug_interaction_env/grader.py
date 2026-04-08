@@ -25,13 +25,12 @@ def grade_episode(task_level: str, final_state: dict) -> float:
     identified = set(final_state.get("identified_pairs", []))
     ground_truth_keys = set(final_state.get("ground_truth_keys", []))
 
-    # Sum rewards from all predictions
+
     total_reward = sum(p.get("reward_received", 0.0) for p in predictions.values())
 
-    # Apply severity-weighted termination penalties for unidentified pairs
     unidentified = ground_truth_keys - identified
     for key_str in unidentified:
-        # Expected serialization format from environment.py: "drug_a|drug_b"
+        
         key = tuple(key_str.split("|"))  
         gt = DRUG_INTERACTIONS.get(key, {})
         severity = gt.get("severity", "mild")

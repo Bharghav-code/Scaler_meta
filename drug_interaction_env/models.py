@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import Literal, Optional
 
 
-# ── Action ──────────────────────────────────────────────────────────────────
+
 
 class DrugInteractionAction(BaseModel):
     """Agent action: either flag an interaction or declare DONE."""
@@ -15,7 +15,7 @@ class DrugInteractionAction(BaseModel):
     suggested_action: Optional[Literal["monitor", "reduce_dose", "replace_drug"]] = None
 
 
-# ── Observation ─────────────────────────────────────────────────────────────
+
 
 class FlagEntry(BaseModel):
     """A single flag raised by the agent during the episode."""
@@ -37,11 +37,11 @@ class DrugInteractionObservation(BaseModel):
     steps_remaining: int
 
 
-# ── State ───────────────────────────────────────────────────────────────────
+
 
 class PredictionEntry(BaseModel):
     """Detailed prediction record for a single drug pair."""
-    key: str  # normalized sorted key as string, e.g. "('aspirin', 'warfarin')"
+    key: str  
     predicted_severity: str
     predicted_action: str
     ground_truth_severity: str
