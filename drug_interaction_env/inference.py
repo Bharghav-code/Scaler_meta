@@ -10,9 +10,9 @@ using an LLM via the OpenAI client. Emits structured stdout logs:
     [END] task=easy patient_id=P001 episode_score=1.0
 
 Required environment variables:
-    API_BASE_URL  — LLM API endpoint
-    MODEL_NAME    — model identifier
-    HF_TOKEN      — Hugging Face / API key
+    API_BASE_URL  — https://api-inference.huggingface.co/v1/
+    MODEL_NAME    — meta-llama/Meta-Llama-3-8B-Instruct
+    HF_TOKEN      — set via environment variable
 """
 
 import os
@@ -31,8 +31,8 @@ from grader import grade_episode
 
 
 ENV_BASE_URL = os.environ.get("ENV_BASE_URL", "http://localhost:8000")
-API_BASE_URL = os.environ.get("API_BASE_URL")
-MODEL_NAME = os.environ.get("MODEL_NAME")
+API_BASE_URL = os.environ.get("API_BASE_URL","https://api-inference.huggingface.co/v1/")
+MODEL_NAME = os.environ.get("MODEL_NAME","meta-llama/Meta-Llama-3-8B-Instruct")
 HF_TOKEN = os.environ.get("HF_TOKEN")
 
 TASK_LEVELS = ["easy", "medium", "hard"]
