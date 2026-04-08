@@ -7,7 +7,7 @@ Endpoints:
   GET  /state  → Return current episode state
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Body
 from pydantic import BaseModel
 from typing import Literal, Optional
 
@@ -40,10 +40,10 @@ class StepResponse(BaseModel):
     state: dict
 # API ENDPOINTS
 
-from typing import Optional
+
 
 @app.post("/reset")
-def reset_endpoint(request: Optional[ResetRequest] = None):
+def reset_endpoint(request: Optional[ResetRequest] = Body(default=None)):
     try:
         if request is None:
             request = ResetRequest()
